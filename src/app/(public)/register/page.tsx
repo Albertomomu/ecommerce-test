@@ -4,9 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
 export default function RegisterPage() {
@@ -40,55 +37,77 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="container mx-auto flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="text-center space-y-1">
-          <h1 className="text-2xl font-bold">Crear cuenta</h1>
+    <div className="mx-auto flex min-h-[calc(100vh-4rem)] items-center justify-center px-8">
+      <div className="w-full max-w-[360px] space-y-10">
+        <div className="space-y-3">
+          <h1 className="text-2xl font-bold tracking-[-0.01em]">Crear cuenta</h1>
           <p className="text-sm text-muted-foreground">
             Regístrate para empezar a comprar
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="fullName">Nombre completo</Label>
-            <Input
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label
+              htmlFor="fullName"
+              className="font-label text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground"
+            >
+              Nombre completo
+            </label>
+            <input
               id="fullName"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
+              className="w-full bg-transparent border-b border-[#cfc4c5] pb-2 text-sm text-foreground focus:border-foreground focus:outline-none transition-colors duration-200"
             />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
-            <Input
+          <div className="space-y-2">
+            <label
+              htmlFor="email"
+              className="font-label text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground"
+            >
+              Email
+            </label>
+            <input
               id="email"
               type="email"
               placeholder="tu@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="w-full bg-transparent border-b border-[#cfc4c5] pb-2 text-sm text-foreground placeholder:text-[#cfc4c5] focus:border-foreground focus:outline-none transition-colors duration-200"
             />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="password">Contraseña</Label>
-            <Input
+          <div className="space-y-2">
+            <label
+              htmlFor="password"
+              className="font-label text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground"
+            >
+              Contraseña
+            </label>
+            <input
               id="password"
               type="password"
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="w-full bg-transparent border-b border-[#cfc4c5] pb-2 text-sm text-foreground focus:border-foreground focus:outline-none transition-colors duration-200"
             />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-foreground text-background py-3.5 font-label text-[11px] font-medium tracking-[0.2em] uppercase transition-all duration-200 hover:bg-[#1b1b1b] disabled:opacity-40"
+          >
             {loading ? 'Creando cuenta...' : 'Crear cuenta'}
-          </Button>
+          </button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground">
           ¿Ya tienes cuenta?{' '}
-          <Link href="/login" className="font-medium text-foreground hover:underline">
+          <Link href="/login" className="font-medium text-foreground border-b border-foreground pb-0.5">
             Inicia sesión
           </Link>
         </p>

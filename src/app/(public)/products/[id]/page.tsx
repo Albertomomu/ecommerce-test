@@ -3,11 +3,9 @@
 import { use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ShoppingCart } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useProduct } from '@/lib/queries/products';
 import { useCartStore } from '@/lib/store/cart';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 export default function ProductDetailPage({
@@ -21,13 +19,14 @@ export default function ProductDetailPage({
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="aspect-square animate-pulse rounded-lg bg-muted" />
-          <div className="space-y-4">
-            <div className="h-8 w-2/3 animate-pulse rounded bg-muted" />
-            <div className="h-6 w-1/3 animate-pulse rounded bg-muted" />
-            <div className="h-20 animate-pulse rounded bg-muted" />
+      <div className="mx-auto max-w-[1400px] px-8 py-12">
+        <div className="grid gap-0 md:grid-cols-2">
+          <div className="aspect-[3/4] animate-pulse bg-surface-container-low" />
+          <div className="p-12 space-y-6">
+            <div className="h-4 w-1/4 animate-pulse bg-surface-container-low" />
+            <div className="h-10 w-2/3 animate-pulse bg-surface-container-low" />
+            <div className="h-6 w-1/4 animate-pulse bg-surface-container-low" />
+            <div className="h-24 animate-pulse bg-surface-container-low" />
           </div>
         </div>
       </div>
@@ -36,11 +35,14 @@ export default function ProductDetailPage({
 
   if (error || !product) {
     return (
-      <div className="container mx-auto px-4 py-20 text-center">
+      <div className="mx-auto max-w-[1400px] px-8 py-24 text-center">
         <p className="text-lg text-muted-foreground">Producto no encontrado</p>
-        <Button variant="ghost" asChild className="mt-4">
-          <Link href="/">Volver al catálogo</Link>
-        </Button>
+        <Link
+          href="/"
+          className="inline-block mt-6 font-label text-[11px] font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground border-b border-transparent hover:border-foreground transition-all duration-200"
+        >
+          Volver al catálogo
+        </Link>
       </div>
     );
   }
@@ -60,23 +62,22 @@ export default function ProductDetailPage({
     toast.success('Añadido al carrito');
   };
 
-  const categoryLabel: Record<string, string> = {
-    ropa: 'Ropa',
-    calzado: 'Calzado',
-    accesorios: 'Accesorios',
-  };
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Button variant="ghost" size="sm" asChild className="mb-6">
-        <Link href="/">
-          <ArrowLeft className="size-4" />
-          Volver al catálogo
+    <div className="mx-auto max-w-[1400px]">
+      {/* Back link */}
+      <div className="px-8 py-6">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 font-label text-[11px] font-medium tracking-[0.12em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+        >
+          <ArrowLeft className="size-3.5" />
+          Volver
         </Link>
-      </Button>
+      </div>
 
-      <div className="grid gap-8 md:grid-cols-2">
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
+      <div className="grid md:grid-cols-2">
+        {/* Image */}
+        <div className="relative aspect-[3/4] overflow-hidden bg-surface-container-low">
           {product.image_url ? (
             <Image
               src={product.image_url}
@@ -93,37 +94,63 @@ export default function ProductDetailPage({
           )}
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary">
-              {categoryLabel[product.category] || product.category}
-            </Badge>
-            {product.stock <= 0 ? (
-              <Badge variant="destructive">Agotado</Badge>
-            ) : product.stock <= 5 ? (
-              <Badge variant="outline" className="text-orange-600 border-orange-300">
-                Quedan {product.stock}
-              </Badge>
-            ) : (
-              <Badge variant="outline">{product.stock} en stock</Badge>
-            )}
-          </div>
+        {/* Product info */}
+        <div className="px-8 md:px-16 py-12 flex flex-col">
+          <p className="font-label text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground">
+            {product.category}
+          </p>
 
-          <h1 className="text-3xl font-bold">{product.name}</h1>
-          <p className="text-2xl font-bold">{product.price.toFixed(2)}&euro;</p>
-          <p className="text-muted-foreground leading-relaxed">
+          <h1 className="mt-4 text-3xl font-bold tracking-[-0.01em] text-foreground leading-tight">
+            {product.name}
+          </h1>
+
+          <p className="mt-4 font-label text-xl font-medium text-foreground">
+            {product.price.toFixed(2)}&euro;
+          </p>
+
+          <p className="mt-6 text-sm text-muted-foreground leading-relaxed">
             {product.description}
           </p>
 
-          <Button
-            size="lg"
-            className="w-full md:w-auto"
+          {/* Stock info */}
+          <div className="mt-6">
+            {product.stock <= 0 ? (
+              <p className="font-label text-[10px] tracking-[0.15em] uppercase text-[#ba1a1a]">
+                Agotado
+              </p>
+            ) : product.stock <= 5 ? (
+              <p className="font-label text-[10px] tracking-[0.15em] uppercase text-[#ba1a1a]">
+                Quedan {product.stock} unidades
+              </p>
+            ) : (
+              <p className="font-label text-[10px] tracking-[0.15em] uppercase text-muted-foreground">
+                {product.stock} en stock
+              </p>
+            )}
+          </div>
+
+          {/* Add to cart button - strict square, black */}
+          <button
             onClick={handleAdd}
             disabled={product.stock <= 0}
+            className="mt-8 w-full bg-foreground text-background py-4 font-label text-[11px] font-medium tracking-[0.2em] uppercase transition-all duration-200 hover:bg-[#1b1b1b] disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <ShoppingCart className="size-5" />
-            Añadir al carrito
-          </Button>
+            {product.stock <= 0 ? 'Sin stock' : 'Añadir al carrito'}
+          </button>
+
+          {/* Product details accordion-style */}
+          <div className="mt-auto pt-12 space-y-0">
+            <div className="border-t border-[#e3e2df] py-4">
+              <p className="font-label text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground">
+                Envío gratuito en pedidos +50&euro;
+              </p>
+            </div>
+            <div className="border-t border-[#e3e2df] py-4">
+              <p className="font-label text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground">
+                Devoluciones gratuitas en 30 días
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

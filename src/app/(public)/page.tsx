@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useInfiniteProducts } from '@/lib/queries/products';
 import { SearchBar } from '@/components/features/catalog/SearchBar';
 import { Filters } from '@/components/features/catalog/Filters';
@@ -14,8 +15,22 @@ type FiltersState = {
 };
 
 export default function CatalogPage() {
+  return (
+    <Suspense>
+      <CatalogContent />
+    </Suspense>
+  );
+}
+
+function CatalogContent() {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get('category') || undefined;
+
   const [search, setSearch] = useState('');
-  const [filters, setFilters] = useState<FiltersState>({});
+  const [filters, setFilters] = useState<FiltersState>({
+    category: initialCategory,
+  });
+  const [showSearch, setShowSearch] = useState(false);
 
   const {
     data,
@@ -32,37 +47,63 @@ export default function CatalogPage() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Catálogo</h1>
-        <p className="text-muted-foreground">
-          Explora nuestra colección de moda, calzado y accesorios
-        </p>
-      </div>
-
-      <div className="space-y-4">
-        <SearchBar value={search} onChange={setSearch} />
-        <Filters filters={filters} onChange={setFilters} />
-      </div>
-
-      {isLoading ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-80 animate-pulse rounded-lg bg-muted"
-            />
-          ))}
+    <div>
+      {/* Hero Section */}
+      <section className="mx-auto max-w-[1400px] px-8 pt-20 pb-16">
+        <div className="max-w-[720px]">
+          <p className="font-label text-[10px] font-medium tracking-[0.25em] uppercase text-muted-foreground mb-6">
+            Colección Primavera / Verano 2026
+          </p>
+          <h1 className="text-[3.5rem] font-bold leading-[1.05] tracking-[-0.02em] text-foreground">
+            Un estudio en materiales duraderos y siluetas refinadas
+          </h1>
+          <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-[540px]">
+            Una colección curada de piezas atemporales diseñadas para la longevidad y la utilidad sin esfuerzo.
+          </p>
         </div>
-      ) : (
-        <ProductGrid products={products} />
-      )}
+      </section>
 
-      <InfiniteScrollTrigger
-        onTrigger={handleFetchNext}
-        hasMore={!!hasNextPage}
-        isLoading={isFetchingNextPage}
-      />
+      {/* Filters & Search */}
+      <section className="mx-auto max-w-[1400px] px-8 pb-12">
+        <div className="flex items-center justify-between gap-8">
+          <Filters filters={filters} onChange={setFilters} />
+
+          <button
+            onClick={() => setShowSearch(!showSearch)}
+            className="font-label text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+          >
+            {showSearch ? 'Cerrar' : 'Buscar'}
+          </button>
+        </div>
+
+        {showSearch && (
+          <div className="mt-6">
+            <SearchBar value={search} onChange={setSearch} />
+          </div>
+        )}
+      </section>
+
+      {/* Product Grid */}
+      <section className="mx-auto max-w-[1400px] px-8 pb-16">
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-[2px] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="aspect-[3/4] animate-pulse bg-surface-container-low"
+              />
+            ))}
+          </div>
+        ) : (
+          <ProductGrid products={products} />
+        )}
+
+        <InfiniteScrollTrigger
+          onTrigger={handleFetchNext}
+          hasMore={!!hasNextPage}
+          isLoading={isFetchingNextPage}
+        />
+      </section>
     </div>
   );
 }

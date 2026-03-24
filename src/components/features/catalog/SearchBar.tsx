@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 
 type Props = {
   value: string;
@@ -25,12 +24,12 @@ export function SearchBar({ value, onChange }: Props) {
 
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-      <Input
+      <Search className="absolute left-0 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+      <input
         placeholder="Buscar productos..."
         value={local}
         onChange={(e) => setLocal(e.target.value)}
-        className="pl-9"
+        className="w-full bg-transparent border-b border-[#cfc4c5] pl-7 pb-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none transition-colors duration-200"
       />
     </div>
   );

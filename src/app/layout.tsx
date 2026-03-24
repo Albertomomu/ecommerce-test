@@ -1,23 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/features/catalog/Header";
+import { Footer } from "@/components/features/catalog/Footer";
 import { Toaster } from "sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "PLOOT — Tienda de Moda y Accesorios",
-  description: "Tu tienda online de moda, calzado y accesorios",
+  title: "PLOOT | El Archivo Digital",
+  description: "Una colección curada de piezas atemporales diseñadas para la longevidad y la utilidad sin esfuerzo",
 };
 
 export default function RootLayout({
@@ -28,12 +29,13 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${spaceGrotesk.variable} h-full`}
     >
       <body className="min-h-full flex flex-col">
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>
+          <Footer />
           <Toaster richColors position="bottom-right" />
         </Providers>
       </body>

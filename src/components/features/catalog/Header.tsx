@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingBag, User, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ShoppingBag, User, LogOut, Search } from 'lucide-react';
 import { useCartStore } from '@/lib/store/cart';
 import { CartDrawer } from '@/components/features/cart/CartDrawer';
 import { useState, useEffect } from 'react';
@@ -36,48 +35,74 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-14 items-center justify-between px-4">
-        <Link href="/" className="text-xl font-bold tracking-tight">
+    <header className="sticky top-0 z-50 bg-[#faf9f6]/80 backdrop-blur-[20px]">
+      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-8">
+        <Link
+          href="/"
+          className="font-label text-xs font-medium tracking-[0.3em] uppercase text-foreground"
+        >
           PLOOT
         </Link>
 
-        <div className="flex items-center gap-2">
+        <nav className="hidden md:flex items-center gap-10">
+          <Link
+            href="/?category=ropa"
+            className="font-label text-[11px] font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+          >
+            Ropa
+          </Link>
+          <Link
+            href="/?category=calzado"
+            className="font-label text-[11px] font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+          >
+            Calzado
+          </Link>
+          <Link
+            href="/?category=accesorios"
+            className="font-label text-[11px] font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+          >
+            Accesorios
+          </Link>
+        </nav>
+
+        <div className="flex items-center gap-6">
+          <Search className="size-[18px] text-muted-foreground hover:text-foreground cursor-pointer transition-colors duration-200" />
+
           {user ? (
             <>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/orders">
-                  <User className="size-4" />
-                  Mis pedidos
-                </Link>
-              </Button>
-              <Button variant="ghost" size="icon-sm" onClick={handleSignOut}>
-                <LogOut className="size-4" />
-              </Button>
+              <Link
+                href="/orders"
+                className="font-label text-[11px] font-medium tracking-[0.1em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+              >
+                Pedidos
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="text-muted-foreground hover:text-foreground transition-colors duration-200"
+              >
+                <LogOut className="size-[18px]" />
+              </button>
             </>
           ) : (
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/login">
-                <User className="size-4" />
-                Iniciar sesión
-              </Link>
-            </Button>
+            <Link
+              href="/login"
+              className="text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              <User className="size-[18px]" />
+            </Link>
           )}
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="relative"
+          <button
+            className="relative text-muted-foreground hover:text-foreground transition-colors duration-200"
             onClick={() => setCartOpen(true)}
           >
-            <ShoppingBag className="size-4" />
-            Carrito
+            <ShoppingBag className="size-[18px]" />
             {mounted && totalItems() > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+              <span className="absolute -top-2 -right-2 flex size-4 items-center justify-center bg-foreground text-[9px] font-label font-bold text-background">
                 {totalItems()}
               </span>
             )}
-          </Button>
+          </button>
 
           <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
         </div>

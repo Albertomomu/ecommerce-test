@@ -2,9 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useCartStore } from '@/lib/store/cart';
 import { useCreateOrder } from '@/lib/queries/orders';
 import { toast } from 'sonner';
@@ -73,66 +70,93 @@ export function CheckoutForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-lg font-bold">Datos de envío</h2>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <p className="font-label text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground">
+        Datos de envío
+      </p>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="fullName">Nombre completo</Label>
-        <Input
-          id="fullName"
-          value={form.fullName}
-          onChange={(e) => handleChange('fullName', e.target.value)}
-        />
-        {errors.fullName && (
-          <p className="text-xs text-destructive">{errors.fullName}</p>
-        )}
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="address">Dirección</Label>
-        <Input
-          id="address"
-          value={form.address}
-          onChange={(e) => handleChange('address', e.target.value)}
-        />
-        {errors.address && (
-          <p className="text-xs text-destructive">{errors.address}</p>
-        )}
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="city">Ciudad</Label>
-          <Input
-            id="city"
-            value={form.city}
-            onChange={(e) => handleChange('city', e.target.value)}
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <label
+            htmlFor="fullName"
+            className="font-label text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground"
+          >
+            Nombre completo
+          </label>
+          <input
+            id="fullName"
+            value={form.fullName}
+            onChange={(e) => handleChange('fullName', e.target.value)}
+            className="w-full bg-transparent border-b border-[#cfc4c5] pb-2 text-sm text-foreground focus:border-foreground focus:outline-none transition-colors duration-200"
           />
-          {errors.city && (
-            <p className="text-xs text-destructive">{errors.city}</p>
+          {errors.fullName && (
+            <p className="text-[10px] text-[#ba1a1a]">{errors.fullName}</p>
           )}
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="postalCode">Código postal</Label>
-          <Input
-            id="postalCode"
-            value={form.postalCode}
-            onChange={(e) => handleChange('postalCode', e.target.value)}
+
+        <div className="space-y-2">
+          <label
+            htmlFor="address"
+            className="font-label text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground"
+          >
+            Dirección
+          </label>
+          <input
+            id="address"
+            value={form.address}
+            onChange={(e) => handleChange('address', e.target.value)}
+            className="w-full bg-transparent border-b border-[#cfc4c5] pb-2 text-sm text-foreground focus:border-foreground focus:outline-none transition-colors duration-200"
           />
-          {errors.postalCode && (
-            <p className="text-xs text-destructive">{errors.postalCode}</p>
+          {errors.address && (
+            <p className="text-[10px] text-[#ba1a1a]">{errors.address}</p>
           )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-8">
+          <div className="space-y-2">
+            <label
+              htmlFor="city"
+              className="font-label text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground"
+            >
+              Ciudad
+            </label>
+            <input
+              id="city"
+              value={form.city}
+              onChange={(e) => handleChange('city', e.target.value)}
+              className="w-full bg-transparent border-b border-[#cfc4c5] pb-2 text-sm text-foreground focus:border-foreground focus:outline-none transition-colors duration-200"
+            />
+            {errors.city && (
+              <p className="text-[10px] text-[#ba1a1a]">{errors.city}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <label
+              htmlFor="postalCode"
+              className="font-label text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground"
+            >
+              Código postal
+            </label>
+            <input
+              id="postalCode"
+              value={form.postalCode}
+              onChange={(e) => handleChange('postalCode', e.target.value)}
+              className="w-full bg-transparent border-b border-[#cfc4c5] pb-2 text-sm text-foreground focus:border-foreground focus:outline-none transition-colors duration-200"
+            />
+            {errors.postalCode && (
+              <p className="text-[10px] text-[#ba1a1a]">{errors.postalCode}</p>
+            )}
+          </div>
         </div>
       </div>
 
-      <Button
+      <button
         type="submit"
-        size="lg"
-        className="w-full"
         disabled={createOrder.isPending}
+        className="w-full bg-foreground text-background py-4 font-label text-[11px] font-medium tracking-[0.2em] uppercase transition-all duration-200 hover:bg-[#1b1b1b] disabled:opacity-40"
       >
         {createOrder.isPending ? 'Procesando...' : 'Confirmar pedido'}
-      </Button>
+      </button>
     </form>
   );
 }

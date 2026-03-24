@@ -1,23 +1,28 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { useCartStore } from '@/lib/store/cart';
 
 export function CartSummary({ onClose }: { onClose: () => void }) {
   const totalPrice = useCartStore((s) => s.totalPrice);
 
   return (
-    <div className="border-t px-6 py-4 space-y-3">
-      <Separator />
-      <div className="flex items-center justify-between text-base font-bold">
-        <span>Total</span>
-        <span>{totalPrice().toFixed(2)}&euro;</span>
+    <div className="border-t border-[#e3e2df] px-8 py-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="font-label text-[10px] font-medium tracking-[0.15em] uppercase text-muted-foreground">
+          Total
+        </span>
+        <span className="font-label text-base font-medium text-foreground">
+          {totalPrice().toFixed(2)}&euro;
+        </span>
       </div>
-      <Button className="w-full" size="lg" asChild onClick={onClose}>
-        <Link href="/checkout">Ir al checkout</Link>
-      </Button>
+      <Link
+        href="/checkout"
+        onClick={onClose}
+        className="block w-full bg-foreground text-background py-3.5 font-label text-[11px] font-medium tracking-[0.2em] uppercase text-center transition-all duration-200 hover:bg-[#1b1b1b]"
+      >
+        Ir al checkout
+      </Link>
     </div>
   );
 }

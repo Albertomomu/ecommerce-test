@@ -29,9 +29,11 @@ export function InfiniteScrollTrigger({ onTrigger, hasMore, isLoading }: Props) 
   if (!hasMore) return null;
 
   return (
-    <div ref={ref} className="flex justify-center py-8">
+    <div ref={ref} className="flex justify-center py-12">
       {isLoading && (
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+        <span className="font-label text-[10px] font-medium tracking-[0.2em] uppercase text-muted-foreground animate-pulse">
+          Cargando...
+        </span>
       )}
     </div>
   );
