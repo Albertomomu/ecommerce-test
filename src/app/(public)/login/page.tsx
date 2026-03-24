@@ -6,6 +6,17 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 
+const AUTH_ERRORS: Record<string, string> = {
+  'Email not confirmed': 'Debes confirmar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.',
+  'Invalid login credentials': 'Email o contraseña incorrectos.',
+  'Email rate limit exceeded': 'Demasiados intentos. Espera unos minutos.',
+  'User not found': 'No existe una cuenta con ese email.',
+};
+
+function translateError(msg: string): string {
+  return AUTH_ERRORS[msg] || msg;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -23,7 +34,7 @@ export default function LoginPage() {
     });
 
     if (error) {
-      toast.error(error.message);
+      toast.error(translateError(error.message));
       setLoading(false);
       return;
     }

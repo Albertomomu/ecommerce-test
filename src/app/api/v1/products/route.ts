@@ -45,7 +45,11 @@ export async function GET(request: NextRequest) {
   }
 
   if (cursor) {
-    query = query.gt('created_at', cursor);
+    // Cursor compuesto: "created_at|id"
+    const [cursorDate, cursorId] = cursor.split('|');
+    query = query.or(
+      `created_at.gt.${cursorDate},and(created_at.eq.${cursorDate},id.gt.${cursorId})`
+    );
   }
 
   const { data, error } = await query;
@@ -56,8 +60,9 @@ export async function GET(request: NextRequest) {
 
   const hasMore = data.length > limit;
   const products = hasMore ? data.slice(0, limit) : data;
-  const nextCursor = hasMore
-    ? products[products.length - 1].created_at
+  const lastProduct = products[products.length - 1];
+  const nextCursor = hasMore && lastProduct
+    ? `${lastProduct.created_at}|${lastProduct.id}`
     : null;
 
   return NextResponse.json({ products, nextCursor });

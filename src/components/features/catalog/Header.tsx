@@ -9,7 +9,8 @@ import { createClient } from '@/lib/supabase/client';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 export function Header() {
-  const totalItems = useCartStore((s) => s.totalItems);
+  const items = useCartStore((s) => s.items);
+  const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
   const [cartOpen, setCartOpen] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -66,7 +67,12 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-6">
-          <Search className="size-[18px] text-muted-foreground hover:text-foreground cursor-pointer transition-colors duration-200" />
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('open-search'))}
+            className="text-muted-foreground hover:text-foreground transition-colors duration-200"
+          >
+            <Search className="size-[18px]" />
+          </button>
 
           {user ? (
             <>
@@ -97,9 +103,9 @@ export function Header() {
             onClick={() => setCartOpen(true)}
           >
             <ShoppingBag className="size-[18px]" />
-            {mounted && totalItems() > 0 && (
-              <span className="absolute -top-2 -right-2 flex size-4 items-center justify-center bg-foreground text-[9px] font-label font-bold text-background">
-                {totalItems()}
+            {mounted && itemCount > 0 && (
+              <span className="absolute -top-2.5 -right-3 flex size-[18px] items-center justify-center bg-foreground text-[9px] font-label font-semibold text-background rounded-full">
+                {itemCount}
               </span>
             )}
           </button>

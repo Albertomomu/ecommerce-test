@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, Suspense } from 'react';
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useInfiniteProducts } from '@/lib/queries/products';
 import { SearchBar } from '@/components/features/catalog/SearchBar';
@@ -24,13 +24,27 @@ export default function CatalogPage() {
 
 function CatalogContent() {
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get('category') || undefined;
+  const urlCategory = searchParams.get('category') || undefined;
 
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState<FiltersState>({
-    category: initialCategory,
+    category: urlCategory,
   });
   const [showSearch, setShowSearch] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, category: urlCategory }));
+  }, [urlCategory]);
+
+  useEffect(() => {
+    const handler = () => {
+      setShowSearch(true);
+      setTimeout(() => searchRef.current?.focus(), 100);
+    };
+    window.addEventListener('open-search', handler);
+    return () => window.removeEventListener('open-search', handler);
+  }, []);
 
   const {
     data,
@@ -78,7 +92,7 @@ function CatalogContent() {
 
         {showSearch && (
           <div className="mt-6">
-            <SearchBar value={search} onChange={setSearch} />
+            <SearchBar ref={searchRef} value={search} onChange={setSearch} />
           </div>
         )}
       </section>

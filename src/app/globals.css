@@ -104,6 +104,12 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  a, button, [role="button"], input[type="submit"], input[type="button"], select, summary, label[for] {
+    cursor: pointer;
+  }
+  a svg, button svg {
+    pointer-events: none;
+  }
 }
 
 /* Utility for label font (Space Grotesk) */

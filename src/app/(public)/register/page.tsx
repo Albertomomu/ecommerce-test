@@ -6,6 +6,17 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 
+const AUTH_ERRORS: Record<string, string> = {
+  'User already registered': 'Ya existe una cuenta con ese email.',
+  'Password should be at least 6 characters': 'La contraseña debe tener al menos 6 caracteres.',
+  'Email rate limit exceeded': 'Demasiados intentos. Espera unos minutos.',
+  'Signup requires a valid password': 'Introduce una contraseña válida.',
+};
+
+function translateError(msg: string): string {
+  return AUTH_ERRORS[msg] || msg;
+}
+
 export default function RegisterPage() {
   const router = useRouter();
   const [fullName, setFullName] = useState('');
@@ -27,7 +38,7 @@ export default function RegisterPage() {
     });
 
     if (error) {
-      toast.error(error.message);
+      toast.error(translateError(error.message));
       setLoading(false);
       return;
     }

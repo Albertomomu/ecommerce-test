@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef } from 'react';
 import { Search } from 'lucide-react';
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
   onChange: (value: string) => void;
 };
 
-export function SearchBar({ value, onChange }: Props) {
+export const SearchBar = forwardRef<HTMLInputElement, Props>(function SearchBar({ value, onChange }, ref) {
   const [local, setLocal] = useState(value);
 
   useEffect(() => {
@@ -26,6 +26,7 @@ export function SearchBar({ value, onChange }: Props) {
     <div className="relative">
       <Search className="absolute left-0 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
       <input
+        ref={ref}
         placeholder="Buscar productos..."
         value={local}
         onChange={(e) => setLocal(e.target.value)}
@@ -33,4 +34,4 @@ export function SearchBar({ value, onChange }: Props) {
       />
     </div>
   );
-}
+});
