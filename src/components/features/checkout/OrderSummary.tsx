@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useCartStore } from '@/lib/store/cart';
 
 export function OrderSummary() {
@@ -18,12 +17,10 @@ export function OrderSummary() {
           <div key={item.product_id} className="flex items-center gap-4">
             <div className="relative size-14 shrink-0 overflow-hidden bg-surface-container-high">
               {item.image_url && (
-                <Image
+                <img
                   src={item.image_url}
                   alt={item.name}
-                  fill
-                  className="object-cover"
-                  sizes="56px"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               )}
             </div>

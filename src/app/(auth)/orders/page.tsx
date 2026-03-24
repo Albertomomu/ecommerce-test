@@ -1,7 +1,6 @@
 'use client';
 
 import { useOrders } from '@/lib/queries/orders';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Package } from 'lucide-react';
 
@@ -84,12 +83,10 @@ export default function OrdersPage() {
                   >
                     <div className="relative size-12 shrink-0 overflow-hidden bg-surface-container-high">
                       {item.product?.image_url && (
-                        <Image
+                        <img
                           src={item.product.image_url}
                           alt={item.product?.name || ''}
-                          fill
-                          className="object-cover"
-                          sizes="48px"
+                          className="absolute inset-0 w-full h-full object-cover"
                         />
                       )}
                     </div>

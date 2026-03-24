@@ -1,7 +1,6 @@
 'use client';
 
 import { use } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useProduct } from '@/lib/queries/products';
@@ -79,13 +78,10 @@ export default function ProductDetailPage({
         {/* Image */}
         <div className="relative aspect-[3/4] overflow-hidden bg-surface-container-low">
           {product.image_url ? (
-            <Image
+            <img
               src={product.image_url}
               alt={product.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
+              className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground">

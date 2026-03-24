@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { Minus, Plus, X } from 'lucide-react';
 import { useCartStore } from '@/lib/store/cart';
 import type { CartItem as CartItemType } from '@/types';
@@ -13,12 +12,10 @@ export function CartItem({ item }: { item: CartItemType }) {
     <div className="flex gap-4">
       <div className="relative size-20 shrink-0 overflow-hidden bg-surface-container-low">
         {item.image_url ? (
-          <Image
+          <img
             src={item.image_url}
             alt={item.name}
-            fill
-            className="object-cover"
-            sizes="80px"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className="flex items-center justify-center h-full text-xs text-muted-foreground">

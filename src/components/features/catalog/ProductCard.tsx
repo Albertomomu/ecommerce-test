@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useCartStore } from '@/lib/store/cart';
 import type { Product } from '@/types';
@@ -31,12 +30,10 @@ export function ProductCard({ product }: { product: Product }) {
       {/* Image container */}
       <div className="relative aspect-[3/4] overflow-hidden bg-surface-container-low">
         {product.image_url ? (
-          <Image
+          <img
             src={product.image_url}
             alt={product.name}
-            fill
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
           />
         ) : (
           <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
