@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { createOrderSchema } from '@/lib/validations/order';
+import { createRequestLogger } from '@/lib/logger';
+import { rateLimit } from '@/lib/rate-limit';
+
+const orderRateLimiter = rateLimit({
+  interval: 60_000, // 1 minuto
+  uniqueTokenPerInterval: 500,
+});
 
 async function getAuthUser() {
   const supabase = await createClient();
@@ -11,12 +18,16 @@ async function getAuthUser() {
   return user;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const log = createRequestLogger(request);
   const user = await getAuthUser();
+
   if (!user) {
+    log.done(401, 'No autenticado');
     return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
   }
 
+  log.info('Fetching orders', { userId: user.id });
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('orders')
@@ -25,22 +36,45 @@ export async function GET() {
     .order('created_at', { ascending: false });
 
   if (error) {
+    log.done(500, 'Error fetching orders', { error: error.message });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  log.done(200, 'Orders fetched', { count: data.length });
   return NextResponse.json(data);
 }
 
 export async function POST(request: NextRequest) {
+  const log = createRequestLogger(request);
   const user = await getAuthUser();
+
   if (!user) {
+    log.done(401, 'No autenticado');
     return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+  }
+
+  // Rate limiting: 5 requests por minuto por usuario
+  const { success: withinLimit, remaining } = orderRateLimiter.check(5, user.id);
+  if (!withinLimit) {
+    log.done(429, 'Rate limit exceeded', { userId: user.id });
+    return NextResponse.json(
+      { error: 'Demasiadas solicitudes. Inténtalo de nuevo en un momento.' },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': '60',
+          'X-RateLimit-Limit': '5',
+          'X-RateLimit-Remaining': '0',
+        },
+      }
+    );
   }
 
   const body = await request.json();
   const parsed = createOrderSchema.safeParse(body);
 
   if (!parsed.success) {
+    log.done(400, 'Validation failed', { errors: parsed.error.flatten() });
     return NextResponse.json(
       { error: 'Datos inválidos', details: parsed.error.flatten() },
       { status: 400 }
@@ -58,6 +92,9 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (existingOrder) {
+    log.done(200, 'Idempotent hit — returning existing order', {
+      orderId: existingOrder.id,
+    });
     return NextResponse.json(existingOrder);
   }
 
@@ -69,6 +106,7 @@ export async function POST(request: NextRequest) {
     .in('id', productIds);
 
   if (productsError || !products) {
+    log.done(500, 'Error verifying products', { error: productsError?.message });
     return NextResponse.json(
       { error: 'Error al verificar productos' },
       { status: 500 }
@@ -81,12 +119,18 @@ export async function POST(request: NextRequest) {
   for (const item of items) {
     const product = productMap.get(item.product_id);
     if (!product) {
+      log.done(400, 'Product not found', { productId: item.product_id });
       return NextResponse.json(
         { error: `Producto ${item.product_id} no encontrado` },
         { status: 400 }
       );
     }
     if (product.stock < item.quantity) {
+      log.done(400, 'Insufficient stock', {
+        productId: item.product_id,
+        requested: item.quantity,
+        available: product.stock,
+      });
       return NextResponse.json(
         {
           error: `Stock insuficiente para "${product.name}". Disponible: ${product.stock}`,
@@ -114,6 +158,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (orderError) {
+    log.done(500, 'Error creating order', { error: orderError.message });
     return NextResponse.json(
       { error: 'Error al crear pedido' },
       { status: 500 }
@@ -134,6 +179,9 @@ export async function POST(request: NextRequest) {
 
   if (itemsError) {
     await supabase.from('orders').delete().eq('id', order.id);
+    log.done(500, 'Error creating order items — rolled back', {
+      error: itemsError.message,
+    });
     return NextResponse.json(
       { error: 'Error al crear items del pedido' },
       { status: 500 }
@@ -150,7 +198,9 @@ export async function POST(request: NextRequest) {
     if (stockError) {
       // Rollback: delete order (cascades to items)
       await supabase.from('orders').delete().eq('id', order.id);
-      // Restore stock for already decremented items
+      log.done(400, 'Stock decrement failed — rolled back', {
+        productId: item.product_id,
+      });
       return NextResponse.json(
         { error: `Stock insuficiente para un producto` },
         { status: 400 }
@@ -158,5 +208,11 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  log.done(201, 'Order created', {
+    orderId: order.id,
+    total: order.total,
+    itemCount: items.length,
+    rateLimitRemaining: remaining,
+  });
   return NextResponse.json(order, { status: 201 });
 }

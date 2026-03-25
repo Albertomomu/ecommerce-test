@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { productQuerySchema } from '@/lib/validations/product';
+import { createRequestLogger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
+  const log = createRequestLogger(request);
   const params = Object.fromEntries(request.nextUrl.searchParams);
   const parsed = productQuerySchema.safeParse(params);
 
   if (!parsed.success) {
+    log.done(400, 'Invalid query params', { errors: parsed.error.flatten() });
     return NextResponse.json(
       { error: 'Parámetros inválidos', details: parsed.error.flatten() },
       { status: 400 }
@@ -55,6 +58,7 @@ export async function GET(request: NextRequest) {
   const { data, error } = await query;
 
   if (error) {
+    log.done(500, 'DB error fetching products', { error: error.message });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
@@ -65,5 +69,10 @@ export async function GET(request: NextRequest) {
     ? `${lastProduct.created_at}|${lastProduct.id}`
     : null;
 
+  log.done(200, 'Products fetched', {
+    count: products.length,
+    hasMore,
+    filters: { search, category, min_price, max_price },
+  });
   return NextResponse.json({ products, nextCursor });
 }
